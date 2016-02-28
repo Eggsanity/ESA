@@ -1,0 +1,5 @@
+IMAPSRV imap.gmail.com
+EMAILADDR youremail@gmail.com
+SMTPSRV smtp.gmail.com:587
+REFRESH 45
+PASSWORD yourpass
