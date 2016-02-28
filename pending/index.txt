@@ -1,0 +1,2 @@
+When an email command has been submitted but is awaiting confirmation, 
+it will be stored in this directory until confirmation is received.
