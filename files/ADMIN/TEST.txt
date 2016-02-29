@@ -1,3 +1,0 @@
-OWNER: no1
-
-This is a test. If you can read this you have ADMIN permissions.
