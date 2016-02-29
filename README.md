@@ -1,2 +1,1 @@
-# ESA
-Automated e-mail control
+To get started you must go to the data/config.txt file and edit the details specific to your mail server. If you are connecting ESA to a gmail account you only need to replace the username and password fields. After which you need to manually add the email address you want to administer into the text files inside the data/group/A.txt file. This will allow you to add accounts and files as necessary.
