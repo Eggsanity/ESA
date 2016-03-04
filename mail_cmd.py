@@ -138,7 +138,7 @@ def LOOKUP():
         except:
                 return 'Subject: LOOKUP FAILED\n\nCheck syntax'
         results = group_lookup(group)
-        if results[0] == sender:
+        if sender in results[0]:
                 return 'Subject: LOOKUP SUCCESSFUL\n\n=== RESULTS FOR '+group+'===\n'+'\n'.join(results)
         else:
                 return 'Subject: LOOKUP FAILED\n\nYou must be the group supervisor.'
@@ -256,7 +256,7 @@ def INFO():
         global sender
         resp = 'Subject: INFO SUCCESSFUL\n\n'
         # OUTPUT TUTORIAL LINK
-        resp += '=== COMMAND USSAGE ===\nFor command ussage go to www.????.com\n'
+        resp += '=== COMMAND USSAGE ===\nFor command ussage go to https://github.com/Eggsanity/ESA/wiki\n'
         # OUTPUT SUPPORTED COMMANDS
         resp += '=== SUPPORTED COMMANDS ===\n'
         f = open('data/cmd.txt','r')
@@ -284,7 +284,7 @@ def INVITE():
                         permit = True
                 else:
                         return 'Subject: INVITE FAILED\n\nYou are not an ADMIN or a SUPERVISOR'
-        if subject[-1] in ['ADMIN','SUPERVISOR']:
+        elif subject[-1] in ['SUPERVISOR']:
                 if sender in group_lookup('ADMIN'):
                         permit = True
                 else:

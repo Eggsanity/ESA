@@ -17,8 +17,8 @@
 #
 ##########################
 # PROGRAMMER: Andrew Michalski
-# Version: 0.1.11
-# LAST UPDATE: FEB 28, 2016
+# Version: 0.1.12
+# LAST UPDATE: MAR 03, 2016
 ##########################
 import sys
 import imaplib
@@ -29,7 +29,7 @@ import hashlib
 import time
 import mail_cmd #
 
-## CONSTANTS ##
+## CONSTANTS LOADED FROM CONFIG FILE ##
 f = open('data/config.txt','r')
 for line in f:
         if line.split()[0] == 'IMAPSRV':
@@ -43,7 +43,7 @@ for line in f:
         elif line.split()[0] == 'PASSWORD':
                 PASSWORD = line.split()[1]
 
-# LOAD COMMANDS
+# LOAD COMMANDS FROM FILE
 cmd = {'ADMIN':[],'SUPERVISOR':[],'USER':[]}
 f = open('data/cmd.txt','r')
 for line in f:

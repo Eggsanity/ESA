@@ -64,6 +64,12 @@ while 1:
             f.close()
             f = open('data/group/A.txt','w')
             f.write('ADMIN '+admin)
+            f.close()
+            f = open('data/group/S.txt','w')
+            f.write('SUPERVISOR '+admin)
+            f.close()
+            f = open('data/group/U.txt','w')
+            f.write('USER '+admin)
         except:
             print("Something went wrong... Please confirm the application is in a fresh/untampered state.")
         print("SETUP COMPLETED")
