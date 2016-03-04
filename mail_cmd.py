@@ -325,6 +325,8 @@ def NEWGROUP():
         global sender
         if len(subject) < 3:
                 return 'Subject: NEWGROUP FAILED\n\nNeeds a group name and a group supervisor'
+        if not subject[-1] in lookup_group('USER'):
+        	return "Subject: NEWGROUP FAILED\n\nAssigned supervisor needs to be a known user. Add assigned group supervisor to group USER first.
         if subject[1] in ['ADMIN','SUPERVISOR','USER']:
                 return "Subject: NEWGROUP FAILED\n\nYou're attempting to overwrite primary group."
         if sender in group_lookup('ADMIN'):
