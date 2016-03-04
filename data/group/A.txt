@@ -1,1 +1,1 @@
-ADMIN youremail@nowhere.com
+ADMIN
