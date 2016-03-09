@@ -119,7 +119,7 @@ def DELGROUP():
                 # DELETE LINE FOR GROUP
                 content=[]
                 for line in f:
-                        if not line.split()[0] == group:
+                       if not line.split()[0] == group:
                                 content.append(line)
                 f.seek(0)
                 for line in contet:
@@ -138,10 +138,10 @@ def LOOKUP():
         except:
                 return 'Subject: LOOKUP FAILED\n\nCheck syntax'
         results = group_lookup(group)
-        if sender in results[0]:
+        if sender in results:
                 return 'Subject: LOOKUP SUCCESSFUL\n\n=== RESULTS FOR '+group+'===\n'+'\n'.join(results)
         else:
-                return 'Subject: LOOKUP FAILED\n\nYou must be the group supervisor.'
+                return 'Subject: LOOKUP FAILED\n\nYou must be a member of this group.'
 
 def KICK():
         """KICK [member] FROM [group]"""
@@ -325,15 +325,14 @@ def NEWGROUP():
         global sender
         if len(subject) < 3:
                 return 'Subject: NEWGROUP FAILED\n\nNeeds a group name and a group supervisor'
-        if not subject[-1] in lookup_group('USER'):
-        	return "Subject: NEWGROUP FAILED\n\nAssigned supervisor needs to be a known user. Add assigned group supervisor to group USER first.
+        if not subject[-1] in group_lookup('USER'):
+        	return "Subject: NEWGROUP FAILED\n\nAssigned supervisor needs to be a known user. Add assigned group supervisor to group USER first."
         if subject[1] in ['ADMIN','SUPERVISOR','USER']:
                 return "Subject: NEWGROUP FAILED\n\nYou're attempting to overwrite primary group."
         if sender in group_lookup('ADMIN'):
                 # CHECK IF GROUP EXISTS
                 try:
-                        import os
-                        os.mkdir('files/'+subject[1].upper())
+                        group_lookup(subject[1]) # REPAIR
                 except:
                         return 'Subject: NEWGROUP FAILED\n\nThis group already exists.'
                 try:
@@ -343,9 +342,15 @@ def NEWGROUP():
                 f.write(subject[1]+' '+subject[2]+'\n')
                 f.close()
                 # ADD TO SUPERVISOR
-                if not sender in group_lookup('SUPERVISOR'):
-                        subject = 'INVITE '+subject[-1]+' '+subject[1]
-                        INVITE()
+                if not subject[-1] in group_lookup('SUPERVISOR'):
+                        subject = 'INVITE '+subject[-1]+' '+'SUPERVISOR'
+                        subject = subject.split()
+                        print(INVITE()) # UNPRINT
+                try:
+                        import os
+                        os.mkdir("./files/"+subject[1])
+                except:
+                        pass
                 return 'Subject: NEWGROUP SUCCESSFUL\n\n'+subject[1]+' is supervised by '+subject[-1]
         else:
                 return 'Subject: NEWGROUP FAILED\n\nThis email address is unable to create groups.'
