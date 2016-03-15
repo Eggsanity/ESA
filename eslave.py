@@ -17,8 +17,8 @@
 #
 ##########################
 # PROGRAMMER: Andrew Michalski
-# Version: 0.1.13
-# LAST UPDATE: MAR 09, 2016
+# Version: 0.2.0
+# LAST UPDATE: MAR 14, 2016
 ##########################
 import sys
 import imaplib
@@ -126,41 +126,34 @@ def schedule():
         from datetime import datetime, timedelta
         now = datetime.now()
         f = open('data/tasks.txt','r+')
-        tasks = [] # ROUGH FIX
         while 1:
-                line = f.readline()
-                if line == '' or line == tasks[:1]:
+                try:
+                        st = f.tell()
+                        line = f.readline()
+                        when, repeat = line.split()[0:2]
+                        todo = line.split()[2:]
+                        when = datetime.strptime(when,'%Y,%m,%d,%H,%M')
+                        if now > when:
+                                mail_cmd.EXECUTE(todo)
+                                if repeat[0].upper() == 'D':
+                                        when += timedelta(days=int(repeat[1:]))
+                                elif repeat[0].upper() == 'W':
+                                        when += timedelta(weeks=int(repeat[1:]))
+                                # SAVE TO TASKS
+                                prepend = f.read()
+                                f.seek(st)
+                                when = when.strftime("%Y,%m,%d,%H,%M")
+                                line = when+' '+repeat+' '+' '.join(todo)+'\n'
+                                f.write(line+prepend)
+                                f.truncate()
+                except:
                         break
-                if line == tasks[:1]:
-                        break
-                else:
-                        tasks.insert(0, line)
-        i = 0
-        while i < len(tasks):
-                when = datetime.strptime(tasks[i].split()[0],'%Y,%m,%d,%H,%M')
-                repeat = tasks[i].split()[1]
-                todo = tasks[i].split()[2:]
-                if now > when:
-                        # EXEC CMD
-                        mail_cmd.EXECUTE(todo)
-                        # ADD REPEAT
-                        if repeat[0] == 'd':
-                                when += timedelta(days=int(repeat[1:]))
-                        elif repeat[0] == 'w':
-                                when += timedelta(weeks=int(repeat[1:]))
-                        # SAVE TO TASKS
-                        when = when.strftime("%Y,%m,%d,%H,%M")
-                        tasks.insert(i, when+' '+repeat+' '+' '.join(todo))
-                        del tasks[i+1]
-                        f.seek(0)
-                        for line in tasks:
-                                f.write(line+'\n')
-                        f.truncate()
-                i += 1
         f.close()
+
 
 ### MAIN #task##
 # CONNECT TO SERVER
+i = 0 # COUNTER FOR schedule()
 M = imaplib.IMAP4_SSL(IMAPSRV)
 try:
 	M.login(EMAILADDR, PASSWORD)
@@ -169,14 +162,17 @@ except:
 	sys.exit(1)
 # READ FROM INBOX
 while 1:
-	recv, data = M.select("INBOX")
-	if recv == "OK":
-		print("CHECKING MAIL...") # TESTING PURPOSES ONLY
-		repeat = read_mail(M)
-		M.close()
-	else:
-		print("FAILED TO SELECT INBOX")
-	if repeat == False:
-		time.sleep(REFRESH)
-		schedule()
+        recv, data = M.select("INBOX")
+        if recv == "OK":
+                print("CHECKING MAIL...") # TESTING PURPOSES ONLY
+                repeat = read_mail(M)
+                M.close()
+        else:
+                print("FAILED TO SELECT INBOX")
+        if repeat == False:
+                time.sleep(REFRESH)
+        i += 1
+        if i >= 1:
+                i = 0
+                schedule()
 M.logout()

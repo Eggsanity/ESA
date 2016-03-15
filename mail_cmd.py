@@ -14,6 +14,31 @@
 #    You should have received a copy of the GNU General Public License
 #    along with ESA.  If not, see <http://www.gnu.org/licenses/>.
 #
+def TASKVIEW():
+        """TASKVIEW [*task]"""
+        global sender
+        global subject
+        if sender in group_lookup('ADMIN'):
+                permit = True
+        f = open('data/tasks.txt','r')
+        if permit = True
+                ret = 'Subject: TASKVIEW SUCCESSFUL\n\n'+f.read()
+        else:
+                ret = 'Subject: TASKVIEW SUCCESSFUL\n\n**ONLY SHOWING TASKS SET BY YOU**'
+                for line in f:
+                        if line.split()[2] == sender
+                                ret += line + '\n'
+        f.close()
+        try:
+                task = subject[1].split('/')[-1]
+                f = open('data/tasks/'+task,'r')
+                ret += '\n\nTASK: '+ task + '\n\n'
+                ret += f.readline()+'\n'
+                f.close()
+        except:
+                pass
+        return ret
+
 def REMIND():
         """REMIND [group] AT [mmddyyyyHHMM] THAT [command-word-word] REPEAT [increment]"""
         global subject
@@ -36,6 +61,15 @@ def REMIND():
                 if subject[c].upper() == 'REPEAT':
                         c += 1
                 repeat = subject[c]
+                # SANITY CHECK
+                if len(group_lookup(group)) < 1:
+                        int('s') # Raises exception if invalid input
+                int(dt)
+                if not len(dt) == 12:
+                        int('s') # Raises exception if invalid input
+                int(repeat[1:])
+                if not repeat[0].upper() in ['D','W','M']:
+                        int('s') # Raises exception if invalid input
         except:
                 return 'Subject: REMIND FAILED\n\nCheck syntax.'
         # Write message to file.
@@ -204,7 +238,7 @@ def EDIT():
                         line = f.readline()
                         if line.split()[0] == 'OWNER:' and line.split()[1] == sender:
                                 permit = True
-                        elif line.split()[0] == 'EDIT:' and sender in line.split()[1].split(','):
+                        elif line.split()[0] == 'EDIT:' and sender in group_lookup(line.split()[1]):
                                 permit = True
                 except:
                         break
@@ -294,6 +328,9 @@ def INVITE():
                         permit = True
                 else:
                         return 'Subject: INVITE FAILED\n\nYou do not have SUPERVISOR permissions for '+subject[-1]
+        if subject[1] in group_lookup('USER'):
+                permit = False
+                return 'Subject: INVITE FAILED\n\nThe user must be added to the USER group before they can be invited to other groups.'
         if permit:
                 if subject[1] in group_lookup(subject[-1]):
                         return "Subject INVITE FAILED\n\n"+subject[1]+" Is already a member of "+subject[-1]
@@ -461,7 +498,10 @@ def BASH():
 
 def group_lookup(group):
         """Looksup group by name returns group members as list."""
-        f = open('data/group/'+group[0].upper()+'.txt','r')
+        try:
+                f = open('data/group/'+group[0].upper()+'.txt','r')
+        except:
+                return ['']
         ret = ['']
         for i in f:
                 if i.split()[0] == group:
@@ -483,10 +523,10 @@ def EXECUTE(path):
         # COMMAND CHECKING
         if subject[0] == 'INFO':
                 return INFO()
-        elif subject[0] == 'BASH': #
-                return BASH()
-        elif subject[0] == 'INSTALL': #
-                return INSTALL()
+#        elif subject[0] == 'BASH': # DISABLED FOR SECURITY REASONS
+#                return BASH()
+#        elif subject[0] == 'INSTALL': # DISABLED BROKEN
+#                return INSTALL()
         elif subject[0] == 'UPLOAD':
                 return UPLOAD()
         elif subject[0] == 'DOWNLOAD':
@@ -505,5 +545,7 @@ def EXECUTE(path):
                 return LOOKUP()
         elif subject[0] == 'BROADCAST':
                 return BROADCAST()
-        elif subject[0] == 'REMIND': #
+        elif subject[0] == 'REMIND':
                 return REMIND()
+        elif subject[0] == 'TASKVIEW':
+                return TASKVIEW()
