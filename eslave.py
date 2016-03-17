@@ -17,7 +17,7 @@
 #
 ##########################
 # PROGRAMMER: Andrew Michalski
-# Version: 0.2.0
+# Version: 0.2.1
 # LAST UPDATE: MAR 14, 2016
 ##########################
 import sys

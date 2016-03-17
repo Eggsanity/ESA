@@ -14,6 +14,29 @@
 #    You should have received a copy of the GNU General Public License
 #    along with ESA.  If not, see <http://www.gnu.org/licenses/>.
 #
+def DELTASK():
+        """DELTASK [task]"""
+        global sender
+        global subject
+        task = subject[1].split('/')[-1]
+        f = open('data/tasks.txt','r+')
+        while 1:
+                try:
+                        st = f.tell()
+                        line = f.readline()
+                        dt, repeat, creator, fname = line.split()
+                        if fname == '/data/tasks/'+task:
+                                if sender == creator or sender in group_lookup('ADMIN'):
+                                        append = f.read()
+                                        f.seek(st)
+                                        f.write(append)
+                                        f.truncate()
+                                        import os
+                                        os.remove('/data/tasks/'+task)
+                        f.close()
+                except:
+                        break
+
 def TASKVIEW():
         """TASKVIEW [*task]"""
         global sender
@@ -21,12 +44,12 @@ def TASKVIEW():
         if sender in group_lookup('ADMIN'):
                 permit = True
         f = open('data/tasks.txt','r')
-        if permit = True
+        if permit == True:
                 ret = 'Subject: TASKVIEW SUCCESSFUL\n\n'+f.read()
         else:
                 ret = 'Subject: TASKVIEW SUCCESSFUL\n\n**ONLY SHOWING TASKS SET BY YOU**'
                 for line in f:
-                        if line.split()[2] == sender
+                        if line.split()[2] == sender:
                                 ret += line + '\n'
         f.close()
         try:
@@ -62,14 +85,17 @@ def REMIND():
                         c += 1
                 repeat = subject[c]
                 # SANITY CHECK
-                if len(group_lookup(group)) < 1:
-                        int('s') # Raises exception if invalid input
-                int(dt)
-                if not len(dt) == 12:
-                        int('s') # Raises exception if invalid input
-                int(repeat[1:])
-                if not repeat[0].upper() in ['D','W','M']:
-                        int('s') # Raises exception if invalid input
+                try:
+                        if len(group_lookup(group)) < 1:
+                                int('s') # Raises exception if invalid input
+                        int(dt)
+                        if not len(dt) == 12:
+                                int('s') # Raises exception if invalid input
+                        int(repeat[1:])
+                        if not repeat[0].upper() in ['D','W','M']:
+                                int('s') # Raises exception if invalid input
+                except:
+                        return 'Subject: REMIND FAILED\n\nInput is impropper.'
         except:
                 return 'Subject: REMIND FAILED\n\nCheck syntax.'
         # Write message to file.
@@ -382,7 +408,7 @@ def NEWGROUP():
                 if not subject[-1] in group_lookup('SUPERVISOR'):
                         subject = 'INVITE '+subject[-1]+' '+'SUPERVISOR'
                         subject = subject.split()
-                        print(INVITE()) # UNPRINT
+                        INVITE()
                 try:
                         import os
                         os.mkdir("./files/"+subject[1])
