@@ -165,7 +165,12 @@ while 1:
         recv, data = M.select("INBOX")
         if recv == "OK":
                 print("CHECKING MAIL...") # TESTING PURPOSES ONLY
-                repeat = read_mail(M)
+                try:
+                        repeat = read_mail(M)
+                except:
+                        print("A problem has occured... retry in 3 seconds.")
+                        sleep(3)
+                        continue
                 M.close()
         else:
                 print("FAILED TO SELECT INBOX")

@@ -175,17 +175,24 @@ def DELGROUP():
         if group in ['ADMIN','SUPERVISOR','USER']:
                 return 'Subject: DELGROUP FAILED\n\nThis group cannot be deleted.'
         if sender in group_lookup('ADMIN'):
-                f = open('data/group/'+group[0]+'.txt','r+')
+                f = open('data/group/'+group[0].upper()+'.txt','r+')
                 # DELETE LINE FOR GROUP
-                content=[]
+                rem = False
+                pre = ''
+                post = ''
                 for line in f:
-                       if not line.split()[0] == group:
-                                content.append(line)
+                        if line.split()[0] == group.upper():
+                                rem = True
+                                continue
+                        if not rem:
+                                pre += line
+                        else:
+                                post += line
                 f.seek(0)
-                for line in contet:
-                        f.write(line+'\n')
+                f.write(pre+post)
+                f.truncate()
                 f.close()
-                return 'Subject: DELGROUP SUCCESSFUL\n\n'+group+' has been deleted.'
+                return 'Subject: DELGROUP SUCCESSFUL\n\n'+group.upper()+' has been deleted.'
         else:
                 return 'DELGROUP FAILED\n\nYou do not have permission'
 
@@ -337,6 +344,8 @@ def INVITE():
         """INVITE [email] TO [group]. Where [email] is the email address you wish to invite to the group. Where [group] is the group you are the supervisor of that you are inviting the user to. Invites a member to a group"""
         global subject
         global sender
+        subject[1] = subject[1].lower()
+        subject[-1] = subject[-1].upper()
         if len(subject) < 3:
                 return 'Subject: INVITE FAILED\n\nDid not receive an email and a group name.'
         if subject[-1] == 'USER':
@@ -350,11 +359,14 @@ def INVITE():
                 else:
                         return 'Subject: INVITE FAILED\n\nYou must be an ADMIN to invite to the ADMIN or SUPERVISOR group.'
         else:
-                if group_lookup(subject[-1])[0] == sender:
-                        permit = True
-                else:
-                        return 'Subject: INVITE FAILED\n\nYou do not have SUPERVISOR permissions for '+subject[-1]
-        if subject[1] in group_lookup('USER'):
+                try:
+                        if group_lookup(subject[-1])[0] == sender:
+                                permit = True
+                        else:
+                                return 'Subject: INVITE FAILED\n\nYou do not have SUPERVISOR permissions for '+subject[-1]
+                except:
+                        return 'Subject: INVITE FAILED\n\nGroup does not exist.'
+        if not subject[1] in group_lookup('USER'):
                 permit = False
                 return 'Subject: INVITE FAILED\n\nThe user must be added to the USER group before they can be invited to other groups.'
         if permit:
@@ -386,6 +398,8 @@ def NEWGROUP():
         """NEWGROUP [group_name] [group_supervisor]. Creates a new group (does not asign members). Groups: ADMIN"""
         global subject
         global sender
+        subject[-1] = subject[-1].lower()
+        subject[1] = subject[1].upper()
         if len(subject) < 3:
                 return 'Subject: NEWGROUP FAILED\n\nNeeds a group name and a group supervisor'
         if not subject[-1] in group_lookup('USER'):
@@ -394,27 +408,28 @@ def NEWGROUP():
                 return "Subject: NEWGROUP FAILED\n\nYou're attempting to overwrite primary group."
         if sender in group_lookup('ADMIN'):
                 # CHECK IF GROUP EXISTS
-                try:
-                        group_lookup(subject[1]) # REPAIR
-                except:
+                if not len(group_lookup(subject[1])) == 0:
                         return 'Subject: NEWGROUP FAILED\n\nThis group already exists.'
-                try:
-                        f = open('data/group/'+subject[1][0].upper()+'.txt','a')
-                except:
-                        f = open('data/group/'+subject[1][0].upper()+'.txt','w')
-                f.write(subject[1]+' '+subject[2]+'\n')
-                f.close()
-                # ADD TO SUPERVISOR
-                if not subject[-1] in group_lookup('SUPERVISOR'):
-                        subject = 'INVITE '+subject[-1]+' '+'SUPERVISOR'
-                        subject = subject.split()
-                        INVITE()
-                try:
-                        import os
-                        os.mkdir("./files/"+subject[1])
-                except:
-                        pass
-                return 'Subject: NEWGROUP SUCCESSFUL\n\n'+subject[1]+' is supervised by '+subject[-1]
+                else:
+                        try:
+                                f = open('data/group/'+subject[1][0].upper()+'.txt','a')
+                        except:
+                                f = open('data/group/'+subject[1][0].upper()+'.txt','w')
+                        f.write(subject[1].upper()+' '+subject[2]+'\n')
+                        f.close()
+                        # ADD TO SUPERVISOR
+                        ret = ''
+                        if not subject[-1] in group_lookup('SUPERVISOR'):
+                                old = subject
+                                subject = 'INVITE '+subject[-1]+' '+'SUPERVISOR'
+                                subject = subject.split()
+                                ret = INVITE()
+                        try:
+                                import os
+                                os.mkdir("./files/"+old[1])
+                        except:
+                                pass
+                        return 'Subject: NEWGROUP SUCCESSFUL\n\n'+old[1]+' is supervised by '+old[-1]+'\n'+ret
         else:
                 return 'Subject: NEWGROUP FAILED\n\nThis email address is unable to create groups.'
         
@@ -455,7 +470,7 @@ def UPLOAD():
         except:
                 return 'Subject: UPLOAD FAILED\n\nInvalid syntax'
         if len(subject) > 2:
-                edit = subject[-1]
+                edit = subject[-1].upper()
         else:
                 edit = ''
         if sender in group_lookup(path):
@@ -527,10 +542,10 @@ def group_lookup(group):
         try:
                 f = open('data/group/'+group[0].upper()+'.txt','r')
         except:
-                return ['']
-        ret = ['']
+                return []
+        ret = []
         for i in f:
-                if i.split()[0] == group:
+                if i.split()[0] == group.upper():
                         ret = i.split()[1].split(',')
         f.close()
         return ret
@@ -545,25 +560,25 @@ def EXECUTE(path):
         f = open(path[1],'r')
         msg = email.message_from_string(f.read())
         sender = path[0]
-        subject = str(msg['Subject']).split()
+        subject = str(msg['Subject']).split() # Can we remove this?
         # COMMAND CHECKING
-        if subject[0] == 'INFO':
+        if subject[0] == 'INFO':#
                 return INFO()
 #        elif subject[0] == 'BASH': # DISABLED FOR SECURITY REASONS
 #                return BASH()
 #        elif subject[0] == 'INSTALL': # DISABLED BROKEN
 #                return INSTALL()
-        elif subject[0] == 'UPLOAD':
+        elif subject[0] == 'UPLOAD':#
                 return UPLOAD()
-        elif subject[0] == 'DOWNLOAD':
+        elif subject[0] == 'DOWNLOAD':#
                 return DOWNLOAD()
-        elif subject[0] == 'NEWGROUP':
+        elif subject[0] == 'NEWGROUP':#
                 return NEWGROUP()
-        elif subject[0] == 'INVITE':
+        elif subject[0] == 'INVITE':#
                 return INVITE()
-        elif subject[0] == 'DELETE':
+        elif subject[0] == 'DELETE':#
                 return DELETE()
-        elif subject[0] == 'EDIT':
+        elif subject[0] == 'EDIT':#
                 return EDIT()
         elif subject[0] == 'KICK':
                 return KICK()
@@ -575,3 +590,5 @@ def EXECUTE(path):
                 return REMIND()
         elif subject[0] == 'TASKVIEW':
                 return TASKVIEW()
+        elif subject[0] == 'DELGROUP':#
+                return DELGROUP()
