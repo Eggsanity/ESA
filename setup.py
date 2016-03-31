@@ -4,7 +4,7 @@ while 1:
     print("You are running the setup script for ESA.")
     print("This will setup the required configuration to get you started.\nAfter which you can do all further configuration through ESA.")
     print("\nYou should connect an UNUSED/NON-PERSONAL email address for ESA.")
-    print("ESA automatically deletes emails after it finishes reading them.\nUsing your personal email ESA will delete all your emails\nbefore you get a chance to read them.\n")
+    print("ESA automatically deletes emails after it finishes reading them.\nUsing your personal email with ESA will delete all your emails\nbefore you get a chance to read them.\n")
     print("If attaching ESA to a gmail account, less information is required. Otherwise you need to know your IMAP and SMTP server addresses/ports.")
     while 1:
         ans = raw_input("Are you connecting ESA to a gmail account?[y/n]: ")
@@ -14,7 +14,7 @@ while 1:
             print("\nYou selected gmail. Make sure you have a gmail account reserved for ESA before continuing")
             while 1:
                 print("The information requested should be for the email address ESA connects to (NOT YOUR PERSONAL EMAIL)")
-                user = raw_input("ENTER USER EMAIL ADDRESS: ")
+                user = raw_input("ENTER FULL USER EMAIL ADDRESS: ")
                 print("Enter your password. (Characters will not show on the screen)")
                 pword = getpass.getpass()
                 print("User address: "+user)

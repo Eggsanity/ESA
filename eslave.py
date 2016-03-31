@@ -17,8 +17,8 @@
 #
 ##########################
 # PROGRAMMER: Andrew Michalski
-# Version: 0.2.1
-# LAST UPDATE: MAR 14, 2016
+# Version: 0.2.2
+# LAST UPDATE: APR 1, 2016
 ##########################
 import sys
 import imaplib
