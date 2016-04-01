@@ -495,40 +495,6 @@ def UPLOAD():
         else:
                 return "Subject: UPLOAD FAILED\n\nYou don't have permission to upload to this group"
 
-def INSTALL(): # BROKEN
-	"""INSTALL: Adds a new command that can be used where the command is passed as a python function in the body of the email. GROUPS: ADMIN"""
-	import email
-	resp = "Subject: This utility is not yet functional.\n\n"
-	global msg
-	if msg.is_multipart():
-		blk = msg.get_payload()[0]
-	else:
-		blk = msg.get_payload()
-	try:
-		blk = str(blk)
-		blk = blk[blk.find('\n\n')+2:]
-	except:
-		try:
-			blk = str(blk)
-		except:
-			resp += "Could not understand email."
-			return resp
-	# write blk into this file
-	f = open('mail_cmd.py','r')
-	lines = [blk]
-	for line in f:
-		lines.append(line)
-	f.close()
-	f = open('mail_cmd.py','w')
-	for line in lines:
-		f.write(line)
-	# Append line to bottom
-	line = '    if subject[0] == "' + blk.split()[1][:-3] + '":\n        return '+blk.split()[1][:-1]
-	f.write(line)
-	f.close()
-	resp += 'The given function was installed. Restart the application for the function to become available.'
-	return resp
-
 def BASH():
         """BASH [cmd]: Where [cmd] is the command that will get passed to the system shell. GROUPS: ADMIN"""
         global subject
@@ -566,8 +532,6 @@ def EXECUTE(path):
                 return INFO()
 #        elif subject[0] == 'BASH': # DISABLED FOR SECURITY REASONS
 #                return BASH()
-#        elif subject[0] == 'INSTALL': # DISABLED BROKEN
-#                return INSTALL()
         elif subject[0] == 'UPLOAD':#
                 return UPLOAD()
         elif subject[0] == 'DOWNLOAD':#
@@ -592,3 +556,6 @@ def EXECUTE(path):
                 return TASKVIEW()
         elif subject[0] == 'DELGROUP':#
                 return DELGROUP()
+        # INSERT()
+        # TEMPLATE()
+        # APP()
