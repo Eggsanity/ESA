@@ -52,7 +52,7 @@ while 1:
     print("\n** ADMIN **")
     print('EMAIL: ' +admin)
 
-    done = raw_input("\n\nDone? [y] finalize configuration. [n] start over. [y/n]")
+    done = raw_input("\n\nDone? [y]finalize configuration. [n]start over. [y/n]:")
     if done.upper() == 'Y':
         try:
             f = open('data/config.txt','w')

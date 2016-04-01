@@ -192,7 +192,7 @@ def DELGROUP():
                 f.write(pre+post)
                 f.truncate()
                 f.close()
-                return 'Subject: DELGROUP SUCCESSFUL\n\n'+group.upper()+' has been deleted.'
+                return 'Subject: DELGROUP SUCCESSFUL\n\n'+group.upper()+' has been deleted.\nConsider KICKing group supervisor from SUPERVISOR if they no longer need supervisor permissions.'
         else:
                 return 'DELGROUP FAILED\n\nYou do not have permission'
 
@@ -366,7 +366,7 @@ def INVITE():
                                 return 'Subject: INVITE FAILED\n\nYou do not have SUPERVISOR permissions for '+subject[-1]
                 except:
                         return 'Subject: INVITE FAILED\n\nGroup does not exist.'
-        if not subject[1] in group_lookup('USER'):
+        if not subject[1] in group_lookup('USER') and not subject[-1] == 'USER':
                 permit = False
                 return 'Subject: INVITE FAILED\n\nThe user must be added to the USER group before they can be invited to other groups.'
         if permit:
@@ -423,13 +423,13 @@ def NEWGROUP():
                                 old = subject
                                 subject = 'INVITE '+subject[-1]+' '+'SUPERVISOR'
                                 subject = subject.split()
-                                ret = INVITE()
+                                ret = str(INVITE())
                         try:
                                 import os
                                 os.mkdir("./files/"+old[1])
                         except:
                                 pass
-                        return 'Subject: NEWGROUP SUCCESSFUL\n\n'+old[1]+' is supervised by '+old[-1]+'\n'+ret
+                        return 'Subject: NEWGROUP SUCCESSFUL\n\n'+old[1]+' is supervised by '+old[-1]+'\n\n'+ret
         else:
                 return 'Subject: NEWGROUP FAILED\n\nThis email address is unable to create groups.'
         
@@ -544,16 +544,18 @@ def EXECUTE(path):
                 return DELETE()
         elif subject[0] == 'EDIT':#
                 return EDIT()
-        elif subject[0] == 'KICK':
+        elif subject[0] == 'KICK':#
                 return KICK()
-        elif subject[0] == 'LOOKUP':
+        elif subject[0] == 'LOOKUP':#
                 return LOOKUP()
-        elif subject[0] == 'BROADCAST':
+        elif subject[0] == 'BROADCAST':#
                 return BROADCAST()
         elif subject[0] == 'REMIND':
                 return REMIND()
         elif subject[0] == 'TASKVIEW':
                 return TASKVIEW()
+        elif subject[0] == 'DELTASK':
+                return DELTASK()
         elif subject[0] == 'DELGROUP':#
                 return DELGROUP()
         # INSERT()
